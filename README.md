@@ -1,2 +1,16 @@
-# codemirror-rego
-A basic rego mode for CodeMirror and the base key-map that we use in our product.
+# Rego Codemirror Addons
+The base rego mode and key map for CodeMirror that we use in our product.
+
+## Usage
+Simply import either the mode, key map, or both after importing CodeMirror. The key map also requires some additional addons to be imported first:
+```javascript
+import CodeMirror from 'codemirror'
+
+// Other CodeMirror addons...
+
+import 'codemirror-rego/mode' // You can now use mode: 'rego'
+// and/or
+import 'codemirror/addon/comment/comment'
+import 'codemirror/addon/edit/matchbrackets'
+import 'codemirror-rego/key-map' // You can now use keyMap: 'styra'
+```
