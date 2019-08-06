@@ -4,16 +4,21 @@
   "description": "",
   "main": "dist/codemirror-rego.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src --out-dir .",
-    "publish": "npm run build && npm publish"
+    "publish": "npm run lint && npm run build && npm publish",
+    "lint": "./scripts/lint"
   },
   "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5"
+    "@babel/preset-env": "^7.5.5",
+    "babel-eslint": "^10.0.2",
+    "eslint": "^6.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-sort-imports-es6-autofix": "^0.4.0",
+    "eslint-plugin-sort-requires": "^2.1.0"
   },
   "files": [
     "key-map.js",
