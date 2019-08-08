@@ -1,5 +1,5 @@
 # Rego Codemirror Addons
-The base rego mode and key map for CodeMirror that we use in our product.
+Rego mode and minimal key map for CodeMirror that we use at Styra.
 
 ## Usage
 Simply import either the mode, key map, or both after importing CodeMirror. The key map also requires some additional addons to be imported first:

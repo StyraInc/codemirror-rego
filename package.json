@@ -1,7 +1,7 @@
 {
   "name": "codemirror-rego",
   "version": "1.0.0",
-  "description": "The base rego mode and key map for CodeMirror that we use in our product.",
+  "description": "Rego mode and minimal key map for CodeMirror that we use at Styra.",
   "main": "dist/codemirror-rego.js",
   "scripts": {
     "build": "babel src --out-dir .",
