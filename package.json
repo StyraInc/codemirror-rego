@@ -1,14 +1,14 @@
 {
   "name": "codemirror-rego",
   "version": "1.0.0",
-  "description": "",
+  "description": "The base rego mode and key map for CodeMirror that we use in our product.",
   "main": "dist/codemirror-rego.js",
   "scripts": {
     "build": "babel src --out-dir .",
     "publish": "npm run lint && npm run build && npm publish",
     "lint": "./scripts/lint"
   },
-  "author": "",
+  "author": "Styra Inc.",
   "license": "Apache-2.0",
   "devDependencies": {
     "@babel/cli": "^7.5.5",
