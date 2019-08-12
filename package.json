@@ -1,15 +1,39 @@
 {
   "name": "codemirror-rego",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Rego mode and minimal key map for CodeMirror that we use at Styra.",
+  "keywords": [
+    "codemirror",
+    "opa",
+    "rego"
+  ],
+  "homepage": "https://github.com/styrainc/codemirror-rego#readme",
+  "bugs": {
+    "url": "https://github.com/styrainc/codemirror-rego/issues",
+    "email": "support+opensource@styra.com"
+  },
+  "repository": "https://github.com/styrainc/codemirror-rego",
+  "license": "Apache-2.0",
+  "author": "Styra Inc.",
+  "files": [
+    "key-map.js",
+    "mode.js",
+    "README.md",
+    "LICENSE"
+  ],
   "main": "dist/codemirror-rego.js",
   "scripts": {
     "build": "babel src --out-dir .",
-    "publish": "npm run lint && npm run build && npm publish",
-    "lint": "./scripts/lint"
+    "lint": "./scripts/lint",
+    "prepare": "npm run lint && npm run build && sort-package-json",
+    "sort-package-json": "sort-package-json"
   },
-  "author": "Styra Inc.",
-  "license": "Apache-2.0",
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
@@ -18,21 +42,10 @@
     "eslint": "^6.1.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-sort-imports-es6-autofix": "^0.4.0",
-    "eslint-plugin-sort-requires": "^2.1.0"
+    "eslint-plugin-sort-requires": "^2.1.0",
+    "sort-package-json": "^1.22.1"
   },
-  "files": [
-    "key-map.js",
-    "mode.js",
-    "README.md",
-    "LICENSE"
-  ],
   "peerDependencies": {
     "codemirror": "^5.48.0"
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env"
-    ]
-  },
-  "dependencies": {}
+  }
 }
