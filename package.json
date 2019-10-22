@@ -1,6 +1,6 @@
 {
   "name": "codemirror-rego",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Rego mode and minimal key map for CodeMirror that we use at Styra.",
   "keywords": [
     "codemirror",
