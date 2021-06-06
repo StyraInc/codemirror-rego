@@ -1,5 +1,6 @@
 # Dist
 /*.js
+capabilities.json
 # Logs
 logs
 *.log
