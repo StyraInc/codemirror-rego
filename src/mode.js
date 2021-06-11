@@ -1,8 +1,11 @@
 const CodeMirror = require('codemirror')
 
+const capabilities = require('./capabilities.json')
+
 CodeMirror.defineMode('rego', (editorOptions, modeOptions) => {
-  const BUILTIN_REFERENCES_RE = /\b(?:base64.decode|base64.encode|base64url.decode|base64url.encode|crypto.x509.parse_certificates|io.jwt.decode|io.jwt.verify_rs256|json.marshal|json.unmarshal|time.now_ns|time.parse_duration_ns|time.parse_ns|time.parse_rfc3339_ns|yaml.marshal|yaml.unmarshal)\b/
-  const BUILTINS_RE = /\b(?:abs|concat|contains|count|endswith|format_int|indexof|lower|max|min|product|re_match|replace|round|set_diff|sort|split|sprintf|startswith|substring|sum|to_number|trace|trim|upper|walk)\b/
+  const BUILTINS = capabilities.builtins.map((c) => c.name)
+  const BUILTIN_REFERENCES_RE = new RegExp('\\b(?:' + BUILTINS.filter((c) => c.includes('.')).join('|') + ')\\b')
+  const BUILTINS_RE = new RegExp('\\b(?:' + BUILTINS.map((c) => c.name).filter((c) => !c.includes('.')).join('|') + ')\\b')
   const IDENTIFIER_RE = /^[A-Za-z_][A-Za-z_0-9]*/
   const KEYWORDS_RE = /\b(?:as|default|else|import|not|with|some)\b/
   const NUMBER_RE = /^-?(?:(?:(?:0(?!\d+)|[1-9][0-9]*)(?:\.[0-9]+)?)|(?:\.[0-9]+))(?:[eE][-+]?[0-9]+)?/
