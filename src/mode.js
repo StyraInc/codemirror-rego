@@ -4,7 +4,7 @@ CodeMirror.defineMode('rego', (editorOptions, modeOptions) => {
   const BUILTIN_REFERENCES_RE = /\b(?:base64.decode|base64.encode|base64url.decode|base64url.encode|crypto.x509.parse_certificates|io.jwt.decode|io.jwt.verify_rs256|json.marshal|json.unmarshal|time.now_ns|time.parse_duration_ns|time.parse_ns|time.parse_rfc3339_ns|yaml.marshal|yaml.unmarshal)\b/
   const BUILTINS_RE = /\b(?:abs|concat|contains|count|endswith|format_int|indexof|lower|max|min|product|re_match|replace|round|set_diff|sort|split|sprintf|startswith|substring|sum|to_number|trace|trim|upper|walk)\b/
   const IDENTIFIER_RE = /^[A-Za-z_][A-Za-z_0-9]*/
-  const KEYWORDS_RE = /\b(?:as|default|else|import|not|with|some)\b/
+  const KEYWORDS_RE = /\b(?:as|default|else|import|not|with|some|in)\b/
   const NUMBER_RE = /^-?(?:(?:(?:0(?!\d+)|[1-9][0-9]*)(?:\.[0-9]+)?)|(?:\.[0-9]+))(?:[eE][-+]?[0-9]+)?/
   const OPERATOR_RE = /^(?:&|;|\*|\+|-|\/|%|=|:=|==|!=|<|>|>=|<=|\|)/
   const SCALAR_RE = /\b(?:true|false|null)\b/
@@ -70,89 +70,106 @@ CodeMirror.defineMode('rego', (editorOptions, modeOptions) => {
     stream.eat('"')
   }
 
-  return {
-    token: function (stream, state) {
-      if (stream.eatSpace()) {
-        return
-      } else if (state.builtin) {
-        stream.match(state.builtin)
-        state.builtin = ''
-        return 'builtin'
-      } else if (state.inPackage) {
-        if (stream.match(/\bas\b/)) {
-          return 'keyword'
-        }
+  function inBacktickString(stream, state) {
+    var next
+    while (next = stream.next()) {
+      if (next === "`" ) {
+        state.tokenize = base
+        break
+      }
+    }
+    return 'string-2'
+  }
 
-        const identifier = eatPathIdentifier(stream)
-        if (identifier) {
-          state.inPackage = false
-          return 'variable-2'
-        }
-      } else if (state.inPath) {
-        const identifier = eatPathIdentifier(stream)
-        if (identifier) {
-          state.inPath = false
-        }
-      } else if (stream.eat('"')) {
-        eatString(stream, state)
-        return 'string'
-      } else if (stream.eat('#')) {
-        stream.skipToEnd()
-        return 'comment'
-      } else if (stream.match(/\bpackage\b/) || stream.match(/\bimport\b/)) {
-        state.inPackage = true
+  function base(stream, state) {
+    if (stream.eatSpace()) {
+      return
+    } else if (state.builtin) {
+      stream.match(state.builtin)
+      state.builtin = ''
+      return 'builtin'
+    } else if (state.inPackage) {
+      if (stream.match(/\bas\b/)) {
         return 'keyword'
-      } else if (stream.match(KEYWORDS_RE)) {
-        return 'keyword'
-      } else if (stream.match(SCALAR_RE)) {
-        return 'atom'
-      } else if (stream.match(/\binput\b/)) {
+      }
+      const identifier = eatPathIdentifier(stream)
+      if (identifier) {
+        state.inPackage = false
         return 'variable-2'
-      } else if (stream.match(NUMBER_RE)) {
-        return 'number'
-      } else if (stream.eat('.')) {
-        state.inPath = true
+      }
+    } else if (state.inPath) {
+      const identifier = eatPathIdentifier(stream)
+      if (identifier) {
+        state.inPath = false
+      }
+    } else if (stream.eat('"')) {
+      eatString(stream, state)
+      return 'string'
+    } else if (stream.eat("`")) {
+      return (state.tokenize = inBacktickString)(stream, state)
+    } else if (stream.eat('#')) {
+      stream.skipToEnd()
+      return 'comment'
+    } else if (stream.match(/\bpackage\b/) || stream.match(/\bimport\b/)) {
+      state.inPackage = true
+      return 'keyword'
+    } else if (stream.match(KEYWORDS_RE)) {
+      return 'keyword'
+    } else if (stream.match(SCALAR_RE)) {
+      return 'atom'
+    } else if (stream.match(/\binput\b/)) {
+      return 'variable-2'
+    } else if (stream.match(NUMBER_RE)) {
+      return 'number'
+    } else if (stream.eat('.')) {
+      state.inPath = true
+    } else {
+      const builtin = eatBuiltinReference(stream)
+      if (builtin) {
+        state.builtin = builtin
       } else {
-        const builtin = eatBuiltinReference(stream)
-        if (builtin) {
-          state.builtin = builtin
-        } else {
-          const identifier = eatIdentifier(stream)
-          if (identifier) {
-            if (identifier === '_') {
-              return 'operator'
-            } else if ((BUILTINS_RE).test(identifier)) {
-              return 'builtin'
-            } else if (rulesByName[identifier]) {
-              return 'def'
-            } else if (packagesByName[identifier]) {
-              return 'variable-2'
-            }
-            return 'variable'
-
-          } else if (stream.match(OPERATOR_RE)) {
+        const identifier = eatIdentifier(stream)
+        if (identifier) {
+          if (identifier === '_') {
             return 'operator'
+          } else if ((BUILTINS_RE).test(identifier)) {
+            return 'builtin'
+          } else if (rulesByName[identifier]) {
+            return 'def'
+          } else if (packagesByName[identifier]) {
+            return 'variable-2'
           }
+          return 'variable'
+
+        } else if (stream.match(OPERATOR_RE)) {
+          return 'operator'
         }
-
-        stream.next()
       }
 
-      if (stream.pos === stream.start) {
-      // We weren’t able to tokenize anything and `stream` is in exactly the
-      // same place as it was at the beginning of the `token()` call. One way
-      // that this can happen is if the stream is syntactically invalid (e.g.,
-      // `bar.[x]`). Whatever the cause, we need to skip past the problematic
-      // character.
-        stream.next()
-      }
+      stream.next()
+    }
+
+    if (stream.pos === stream.start) {
+    // We weren’t able to tokenize anything and `stream` is in exactly the
+    // same place as it was at the beginning of the `token()` call. One way
+    // that this can happen is if the stream is syntactically invalid (e.g.,
+    // `bar.[x]`). Whatever the cause, we need to skip past the problematic
+    // character.
+      stream.next()
+    }
+  }
+
+  return {
+    token: function(stream, state) {
+      return state.tokenize(stream, state)
     },
 
     startState: function () {
       return {
         builtin: '',
         inPackage: false,
-        inPath: false
+        inPath: false,
+        tokenize: base
       }
     },
 
