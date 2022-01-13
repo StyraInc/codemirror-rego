@@ -16,6 +16,7 @@
   "license": "Apache-2.0",
   "author": "Styra Inc.",
   "files": [
+    "capabilities.json",
     "key-map.js",
     "mode.js",
     "README.md",
@@ -24,8 +25,9 @@
   "main": "dist/codemirror-rego.js",
   "scripts": {
     "build": "babel src --out-dir .",
+    "capabilities": "./scripts/capabilities > ./capabilities.json",
     "lint": "./scripts/lint",
-    "prepare": "npm run lint && npm run build && sort-package-json",
+    "prepare": "npm run capabilities && npm run lint && npm run build && sort-package-json",
     "sort-package-json": "sort-package-json"
   },
   "babel": {
