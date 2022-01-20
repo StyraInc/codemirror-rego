@@ -2,6 +2,7 @@
 
 const path = require('path')
 const {execSync} = require('child_process')
+const {lstatSync} = require('fs')
 const {readdirSync} = require('fs')
 const {realpathSync} = require('fs')
 
@@ -25,13 +26,17 @@ function getFilenames(linter, argv) {
   if (argv.length > 0) {
     return argv
       .map((pathname) => path.resolve(pathname))
-      .filter((pathname) => isPathnameLintable(linter, pathname))
+      .flatMap((pathname) => findLintableFiles(linter, pathname))
   }
 
   return findLintableFiles(linter, workingDirectory)
 }
 
 function findLintableFiles(linter, pathname, files = []) {
+  if (lstatSync(pathname).isFile()) {
+    return [pathname]
+  }
+
   const dirents = readdirSync(pathname, {withFileTypes: true})
 
   for (let i = 0, ni = dirents.length; i < ni; ++i) {
