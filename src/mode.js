@@ -6,7 +6,7 @@ CodeMirror.defineMode('rego', (editorOptions, modeOptions) => {
   const BUILTIN_REFERENCES_RE = new RegExp('\\b(?:' + builtins.filter((c) => c.includes('.')).join('|') + ')\\b')
   const BUILTINS_RE = new RegExp('\\b(?:' + builtins.filter((c) => !c.includes('.')).join('|') + ')\\b')
   const IDENTIFIER_RE = /^[A-Za-z_][A-Za-z_0-9]*/
-  const KEYWORDS_RE = /\b(?:as|default|else|import|not|with|some|in|every)\b/
+  const KEYWORDS_RE = /\b(?:as|default|else|import|not|with|some|in|every|if|contains)\b/
   const NUMBER_RE = /^-?(?:(?:(?:0(?!\d+)|[1-9][0-9]*)(?:\.[0-9]+)?)|(?:\.[0-9]+))(?:[eE][-+]?[0-9]+)?/
   const OPERATOR_RE = /^(?:&|;|\*|\+|-|\/|%|=|:=|==|!=|<|>|>=|<=|\|)/
   const SCALAR_RE = /\b(?:true|false|null)\b/
